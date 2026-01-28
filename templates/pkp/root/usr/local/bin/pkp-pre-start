@@ -33,7 +33,7 @@ echo "sed -i -e \"s/enable_cdn = On/enable_cdn = Off/g\" $PKP_CONF"
 sed -i -e "s/enable_cdn = On/enable_cdn = Off/g" $PKP_CONF
 
 # Generate a self-signed cert based on ServerName
-if [ ! -f "$KEY_PATH" ] ||
+if [ ! -f "$KEY_PATH"] && [ "${HTTPS}" = "on" ] ||
    ! openssl x509 -in "$PEM_PATH" -noout -subject | grep -q "$SERVERNAME"; then
     echo "[PKP Pre-Start] Generating certs ..."
     openssl req -x509 -nodes -days 1460 -newkey rsa:2048 \
@@ -41,13 +41,7 @@ if [ ! -f "$KEY_PATH" ] ||
 fi
 
 # Create a fake chain.pem if not exists (to make easier the replacement with a file volume):
-if [ ! -f "$CHAIN_PATH" ]; then
+if [ ! -f "$CHAIN_PATH" ] && [ "${HTTPS}" = "on" ]; then
     echo "[PKP Pre-Start] Creating dummy chain.pem ..."
     cat "$PEM_PATH" > "$CHAIN_PATH"
-fi
-
-# Automatically installed, if requested
-if [ "${PKP_CLI_INSTALL}" = "1" ] &&
-    grep -q 'installed = Off' $PKP_CONF ; then
-    pkp-cli-install
 fi

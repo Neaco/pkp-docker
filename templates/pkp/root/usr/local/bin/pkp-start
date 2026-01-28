@@ -1,6 +1,13 @@
 #!/bin/sh
 
-pkp-pre-start
+# pkp-pre-start
+
+# Automatically installed, if requested
+if [ "${PKP_CLI_INSTALL}" = "1" ] &&
+    grep -q 'installed = Off' $PKP_CONF ; then
+    pkp-cli-install
+fi
+
 
 # If is not running, start the cron service in the background.
 # /usr/sbin/cron -f &
